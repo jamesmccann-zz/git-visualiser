@@ -1,0 +1,2 @@
+window.Visualisation = {}
+Visualisation.branchGraph = {}
