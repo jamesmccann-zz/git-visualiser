@@ -10,7 +10,6 @@ class BranchGraph
     # set up SVG for D3
     @width = $("#branches-display").width();
     @height = $("#branches-display").height();
-    tcolors = d3.scale.category10()
     @body = d3.select("body")
     @svg = @body.select("#branches-display")
               .append("svg")
@@ -357,7 +356,7 @@ class BranchGraph
 
   filter_branch_commits: (include_commit_sha, exclude_commit_sha) ->
     json_data = {include: include_commit_sha, exclude: exclude_commit_sha}
-    $.get "/visualisations/branches_commit_filters.json", json_data, (data) =>
+    $.get "/filter_branch_commits.json", json_data, (data) =>
       branch_names = data
       @nodes = $.grep @nodes, (node, i) =>
         if $.inArray(node.branch.name, branch_names) is -1
@@ -413,7 +412,7 @@ class BranchGraph
         node_id == other_id
 
   getAuthorStats: (branch_name) ->
-    $.get "/visualisations/author_stats", {ref: branch_name}, (data) ->
+    $.get "/author_stats.json", {ref: branch_name}, (data) ->
       $("#authors-list").html(data)
 
   clearAuthorStats: ->

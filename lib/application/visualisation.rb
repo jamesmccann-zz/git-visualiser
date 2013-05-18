@@ -6,7 +6,6 @@ module Visualisation
     total_additions = total_deletions = 0
     remotes_arr = Visualisation.remotes
     Visualisation.branches_with_remotes.each do |branch|
-      puts "#{branch}"
       diff = Visualisation.branch_diff_size(branch)
       head_commit = Visualisation.head_commit_sha(branch)
       merged_with_master = Visualisation.branch_contains_commit("master", head_commit)
@@ -46,9 +45,10 @@ module Visualisation
 
   def self.branches_excluding_commit(commit_sha, remotes = true)
     if remotes
-      return branches - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
+      return branches_with_remotes - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
     else
-      return branches - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
+      # TODO fix this
+      # return branches - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
     end
   end
 
@@ -64,7 +64,6 @@ module Visualisation
       compare_branches.each do |b2|
         next if b1 == b2 || b2.split("/").last == b1 || 
             (merged_branches.has_key?(b2.to_sym) && merged_branches[b2.to_sym].has_key?(b1.to_sym))
-        puts "comparing #{b1} with #{b2}"
         directions = {}
         directions.merge!(:left => true) if branch_merged_with_base?(b1, b2, remotes)
         directions.merge!(:right => true) if right = branch_merged_with_base?(b2, b1, remotes)

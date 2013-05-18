@@ -31,12 +31,12 @@ class CommitGraph
 
   getGraphData: ->
     vis = @
-    $.get "/visualisations/diff_stats.json", {ref: @branch_name}, (data) ->
+    $.get "/commit_diff_stats.json", {ref: @branch_name}, (data) ->
       vis.initializeGraphData(data)
    
   getHistData: ->
     vis = @
-    $.get "/visualisations/commits.json", {ref: @branch_name}, (history_data) ->
+    $.get "/commits.json", {ref: @branch_name}, (history_data) ->
       vis.initHistoryGraph(history_data) 
 
   loadUI: ->
@@ -376,7 +376,7 @@ class CommitGraph
     vis = @
     filter_nodes = null
 
-    $.get "/visualisations/commit_diff_stats.json", {ref: commit_sha}, (history_data) ->
+    $.get "/commit_diff_stats.json", {ref: commit_sha}, (history_data) ->
       # simple filter, replaces current graph with commit graph
       # vis.svg.selectAll('g').remove()
       # vis.initializeGraphData(history_data)

@@ -8,6 +8,9 @@ class CoffeeEngine < Sinatra::Base
 
   get "/javascripts/jquery.min.js" do
   end
+
+  get "/javascripts/moment.min.js" do
+  end
   
   get "/javascripts/*.js" do
     filename = params[:splat].first

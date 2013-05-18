@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+#
+
+begin
+  require 'rubygems'
+  require 'bundler'
+  require 'sinatra'
+  require 'haml'
+  require 'coffee-script'
+  require 'sass'
+  require 'json'
+
+  require 'application/sass_engine'
+  require 'application/coffee_engine'
+  require 'application/visualisation'
+
+  #start the application
+  require 'application/application'
+end

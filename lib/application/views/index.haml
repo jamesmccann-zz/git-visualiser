@@ -1,44 +1,48 @@
-%link(rel="stylesheet" type="text/css" href="stylesheets/app.css")
-%link(rel="stylesheet" type="text/css" href="stylesheets/flat_ui.css")
+!!! 5
+%head
+  %link(rel="stylesheet" type="text/css" href="stylesheets/app.css")
+  %link(rel="stylesheet" type="text/css" href="stylesheets/flat_ui.css")
+  
+%body
+  #sidebar-branches.sidebar
+    %h1 Branches 
+    #branches-controls
+      %label{:for => "filter_merged"}
+        %input#filter_merged_checkbox{:name => "filter_merged", :type => "checkbox"}
+        Filter merged with master
+      %br
+      %label{:for => "filter_remotes"}
+        %input#filter_merged_checkbox{:name => "filter_remotes", :type => "checkbox"}
+        Filter remote branches
+      %input#filter_names_input{:name => "filter_names", :placeholder => "Filter branch names", :type => "text"}
+      %input#show_commit_input.commit_filters_input{:name => "show_commit", :placeholder => "Show commit", :type => "text"}
+      %input#exclude_commit_input.commit_filters_input{:name => "exclude_commit", :placeholder => "Exclude commit", :type => "text"}
+      %a#apply-filters-btn.btn.btn-large.btn-block.apply-btn{:href => "#"}
+        Apply Filters
+    #authors-list
+  #branches-display  
+    #vis-loading
+      %h4 Loading Repository Data...
+      %img{:alt => "Ajax-loader", :src => "images/ajax-loader.gif"}
+  #commits-toolbar{:style => "display: none"}
+    #commit-details
+      %h3{:id => "branch_name"}  
+      %a#back-to-branches-btn{:href => "#"}
+        Back to branches
+      %p{:id => "commit_sha"}
+      %p{:class => "small"}
+        %span{:id => "commit_author"}
+        %br
+        %span{:id => "commit_message"}
+    #history-graph
+      %a{:id => "clear_history_filters", :href => '#'} Clear filter
+  #commits-display
 
 %script(src="javascripts/jquery.min.js" type="text/javascript")
 %script(src="javascripts/d3.min.js" type="text/javascript")
+%script(src="javascripts/moment.min.js" type="text/javascript")
 %script(src="javascripts/namespace.js" type="text/javascript")
 %script(src="javascripts/common.js" type="text/javascript")
 %script(src="javascripts/data_convert.js" type="text/javascript")
 %script(src="javascripts/commit_graph.js" type="text/javascript")
 %script(src="javascripts/branch_graph.js" type="text/javascript")
-
-#sidebar-branches.sidebar
-  %h1 Branches 
-  #branches-controls
-    %label{:for => "filter_merged"}
-      %input#filter_merged_checkbox{:name => "filter_merged", :type => "checkbox"}
-      Filter merged with master
-    %br
-    %label{:for => "filter_remotes"}
-      %input#filter_merged_checkbox{:name => "filter_remotes", :type => "checkbox"}
-      Filter remote branches
-    %input#filter_names_input{:name => "filter_names", :placeholder => "Filter branch names", :type => "text"}
-    %input#show_commit_input.commit_filters_input{:name => "show_commit", :placeholder => "Show commit", :type => "text"}
-    %input#exclude_commit_input.commit_filters_input{:name => "exclude_commit", :placeholder => "Exclude commit", :type => "text"}
-    %a#apply-filters-btn.btn.btn-large.btn-block.apply-btn{:href => "#"}
-      Apply Filters
-  #authors-list
-#branches-display  
-  #vis-loading
-    %h4 Loading Repository Data...
-    %img{:alt => "Ajax-loader", :src => "images/ajax-loader.gif"}
-#commits-toolbar{:style => "display: none"}
-  #commit-details
-    %h3{:id => "branch_name"}  
-    %a#back-to-branches-btn{:href => "#"}
-      Back to branches
-    %p{:id => "commit_sha"}
-    %p{:class => "small"}
-      %span{:id => "commit_author"}
-      %br
-      %span{:id => "commit_message"}
-  #history-graph
-    %a{:id => "clear_history_filters", :href => '#'} Clear filter
-#commits-display
