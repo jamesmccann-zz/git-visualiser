@@ -15,5 +15,3 @@ require './lib/application/application'
 
 # use coffeescript for javascript
 # use Rack::Coffee, root: 'application', urls: '/javascripts'
-
-run GitVisualiser

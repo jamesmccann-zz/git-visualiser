@@ -1,5 +1,6 @@
 module Visualisation
   require 'csv'
+  require 'date'
 
   def self.branches
     branches_arr = [] 
@@ -21,6 +22,7 @@ module Visualisation
 
   def self.branches_with_remotes
     `git branch -a`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') and b.gsub!(/remotes\//, '') }
+      .delete_if { |b| b.include?('->') }
   end
 
   def self.remotes
@@ -108,15 +110,16 @@ module Visualisation
     commit_lines.each_with_index do |commit, id|
       sha1 = commit[0]
       author = commit[1].strip!
-      commit_date = commit[2].strip!
+      commit_date = Date.parse(commit[2].strip!)
       message = commit.slice(3..commit.length-1).join(",").strip!
-      if !last_date.nil? && commit_date.to_date == last_date.to_date
+      if !last_date.nil? && 
+        (commit_date.year == last_date.year && commit_date.yday == last_date.yday)
         i += 1
       else
         i = 1
       end
-      last_date = commit_date
-      commit_stats = {:id => id, :date => commit_date, :num => i, :sha => sha1, 
+      last_date = commit_date.to_date
+      commit_stats = {:id => id, :date => last_date, :num => i, :sha => sha1, 
                       :author => author, :message => message}
       commits << commit_stats
       puts commits
