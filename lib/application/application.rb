@@ -1,4 +1,4 @@
-class GitVisualiser < Sinatra::Base
+class GitVisualiser < Sinatra::Application
 
     use SassEngine
     use CoffeeEngine

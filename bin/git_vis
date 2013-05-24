@@ -3,12 +3,12 @@
 
 begin
   require 'rubygems'
-  require 'bundler'
   require 'sinatra'
   require 'haml'
   require 'coffee-script'
   require 'sass'
   require 'json'
+  require 'thin'
 
   require 'application/sass_engine'
   require 'application/coffee_engine'
