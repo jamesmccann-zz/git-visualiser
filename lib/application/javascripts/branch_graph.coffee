@@ -228,7 +228,6 @@ class BranchGraph
       .style("stroke", (d) -> d3.rgb(branch_color(d)).darker().toString())
       .classed("reflexive", (d) -> d.reflexive)
       .on("mouseover", (d) ->
-        vis.clearAuthorStats()
         d3.selectAll("circle").filter((d2) -> d != d2).transition().style "opacity", "0.25"
         d3.selectAll("text").filter((d2) -> d != d2).transition().style "opacity", "0.10"
         d3.selectAll("path.link").filter((d2) -> d != d2).transition().style "opacity", "0.10"
@@ -413,6 +412,8 @@ class BranchGraph
         node_id == other_id
 
   initAuthorStats: (data) ->
+    console.log data
+
     margin = {top: 10, right: 20, bottom: 30, left: 30}
     width = $("#sidebar-branches").width() - 20 - margin.left - margin.right
     height = 300 - margin.top - margin.bottom
@@ -489,13 +490,14 @@ class BranchGraph
         .attr("height", "40")
 
   getAuthorStats: (branch_name) ->
+    @clearAuthorStats()
     vis = @
     $.get "/author_stats.json", {ref: branch_name}, (author_data) ->
-      $("#authors-graph").show()
-      vis.initAuthorStats(author_data)
+      if author_data.length > 0
+        $("#authors-graph").show()
+        vis.initAuthorStats(author_data)
 
   clearAuthorStats: ->
-    return
     $("#authors-graph").hide()
     $("#authors-graph-chart").empty()
 

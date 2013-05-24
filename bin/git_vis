@@ -3,7 +3,7 @@
 
 begin
   require 'rubygems'
-  require 'sinatra'
+  require 'sinatra/base'
   require 'haml'
   require 'coffee-script'
   require 'sass'
