@@ -46,10 +46,9 @@ class GitVisualiser < Sinatra::Base
     get '/author_stats.json' do
       ref = params[:ref]
 
-      @authors = Visualisation.branch_author_stats(ref)
-      @authors = @authors.slice(0, 3) #show a max of 3 authors
-
-      haml :'/authors_list' if @authors.length > 0
+      authors = Visualisation.branch_author_stats(ref)
+      content_type :json
+      authors.to_json
     end
 
     get '/commits.json' do
@@ -67,15 +66,7 @@ class GitVisualiser < Sinatra::Base
       content_type :json
       file_diff_stats.to_json
     end
-
-    helpers do 
-
-      def gravatar_image(email) 
-        hash = Digest::MD5.hexdigest(email).to_s
-        "<img src=\"http://www.gravatar.com/avatar/#{hash}?s=48\" />"
-      end
-
-    end
+      
 end
 
 puts "Running GitVisualiser"

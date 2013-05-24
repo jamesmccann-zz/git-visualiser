@@ -29,7 +29,7 @@ body,html { height: 100%; margin: 0px; }
     margin-top: 20px;   
   }
 
-  #authors-list {
+  #authors-graph {
     padding: 10px; 
 
     p { 
@@ -113,6 +113,16 @@ body,html { height: 100%; margin: 0px; }
 
   h4 { float: right }
   img { float: left }
+}
+
+#authors-graph { 
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .x.axis path { display:none; }
 }
 
 svg {

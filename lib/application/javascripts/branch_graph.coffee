@@ -411,12 +411,85 @@ class BranchGraph
       @linked_nodes[other_id + ", " + node_id] == 1 ||
         node_id == other_id
 
+  initAuthorStats: (data) ->
+    margin = {top: 10, right: 20, bottom: 30, left: 25}
+    width = $("#sidebar-branches").width() - 20 - margin.left - margin.right
+    height = 300 - margin.top - margin.bottom
+
+    x = d3.scale.ordinal().rangeRoundBands([0, width], .1)
+    y = d3.scale.linear().rangeRound([height, 0])
+
+    colors = d3.scale.category10()
+
+    xAxis = d3.svg.axis().scale(x).orient("bottom")
+    yAxis = d3.svg.axis()
+                  .scale(y)
+                  .orient("left")
+                  .ticks(4)
+                  .tickFormat(d3.format("d"))
+
+    @author_svg = d3.select("#authors-graph-chart")
+                    .append("svg")
+                      .style("background", d3.rgb("#EFEFEF"))
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                      .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
+
+    @y = y
+    data.sort (a, b) -> b.commits - a.commits
+
+    y.domain([0, d3.sum data, (d) -> d.commits])
+    y.nice()
+    ypos = 0
+
+    data.forEach((d) ->
+      d.coords = { y0: ypos, y1: ypos += d.commits }
+      d.color = colors(d.commits)
+    )
+
+    @author_svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0, " + height + ")")
+      .call(xAxis)
+
+    @author_svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+
+    g = @author_svg.selectAll("rect").data(data)
+      .enter()
+      .append("g")
+    g.append("rect")
+      .attr("width", 30)
+      .attr("x", 5)
+      .attr("y", (d) -> height - y(d.coords.y0))
+      .attr("height", (d) -> y(d.coords.y0) - y(d.coords.y1))
+      .attr("fill", (d) -> d.color)
+    g.append("text")
+      .attr("x", 90)
+      .attr("y", (d) -> height - y(d.coords.y0) + 15)
+      .text((d) -> d.name)
+    g.append("text")
+      .attr("x", 90)
+      .attr("y", (d) -> height - y(d.coords.y0) + 30)
+      .text((d) -> "#{d.commits} commits")
+    g.append("svg:image")
+      .attr("xlink:href", (d) -> d.gravatar_url)
+      .attr("x", 40)
+      .attr("y", (d) -> height - y(d.coords.y0))
+      .attr("width", "40")
+      .attr("height", "40")
+
   getAuthorStats: (branch_name) ->
-    $.get "/author_stats.json", {ref: branch_name}, (data) ->
-      $("#authors-list").html(data)
+    vis = @
+    $.get "/author_stats.json", {ref: branch_name}, (author_data) ->
+      $("#authors-graph").show()
+      vis.initAuthorStats(author_data)
 
   clearAuthorStats: ->
-    $("#authors-list").empty()
+    $("#authors-graph").hide()
+    $("#authors-graph-chart").empty()
 
         
 

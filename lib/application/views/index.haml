@@ -19,7 +19,9 @@
       %input#exclude_commit_input.commit_filters_input{:name => "exclude_commit", :placeholder => "Exclude commit", :type => "text"}
       %a#apply-filters-btn.btn.btn-large.btn-block.apply-btn{:href => "#"}
         Apply Filters
-    #authors-list
+    #authors-graph{style: "display: none"}
+      %h4 Top Authors By Commits
+      #authors-graph-chart
   #branches-display  
     #vis-loading
       %h4 Loading Repository Data...

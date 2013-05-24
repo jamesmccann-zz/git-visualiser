@@ -151,9 +151,20 @@ module Visualisation
   end
 
   def self.branch_author_stats(branch)
-    `git log master..#{branch} --pretty=format:%an,%ae \
+    authors = []
+    raw_authors = `git log master..#{branch} --pretty=format:%an,%ae \
       | awk '{ ++c[$0]; } END { for(cc in c) printf "%5d,%s\\n",c[cc],cc; }'\
-      | sort -r`.split(/\n/).each { |c| c.strip! }
+      | sort -r`.split(/\n/).each { |c| c.strip! }.slice(0, 3)
+    raw_authors.each do |author|
+      author = author.split(/,/)
+      authors << {:name => author[1], :commits => author[0], :gravatar_url => gravatar_url(author[2])} 
+    end
+    authors
+  end
+
+  def self.gravatar_url(email) 
+    hash = Digest::MD5.hexdigest(email).to_s
+    "http://www.gravatar.com/avatar/#{hash}?s=40"
   end
 
 end

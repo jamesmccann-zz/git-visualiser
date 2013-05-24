@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'git-visualiser'
-  s.version     = '0.0.4'
+  s.version     = '0.0.5'
   s.date        = '2013-05-18'
   s.summary     = "Sinatra app for Git Visualisation"
   s.description = "A Sinatra app for loading D3-based visualisations of a local Git repository"
