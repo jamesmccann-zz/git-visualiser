@@ -228,6 +228,7 @@ class BranchGraph
       .style("stroke", (d) -> d3.rgb(branch_color(d)).darker().toString())
       .classed("reflexive", (d) -> d.reflexive)
       .on("mouseover", (d) ->
+        vis.clearAuthorStats()
         d3.selectAll("circle").filter((d2) -> d != d2).transition().style "opacity", "0.25"
         d3.selectAll("text").filter((d2) -> d != d2).transition().style "opacity", "0.10"
         d3.selectAll("path.link").filter((d2) -> d != d2).transition().style "opacity", "0.10"
@@ -412,7 +413,7 @@ class BranchGraph
         node_id == other_id
 
   initAuthorStats: (data) ->
-    margin = {top: 10, right: 20, bottom: 30, left: 25}
+    margin = {top: 10, right: 20, bottom: 30, left: 30}
     width = $("#sidebar-branches").width() - 20 - margin.left - margin.right
     height = 300 - margin.top - margin.bottom
 
@@ -441,11 +442,13 @@ class BranchGraph
 
     y.domain([0, d3.sum data, (d) -> d.commits])
     y.nice()
-    ypos = 0
 
+    ypos = 0
+    i = 0
     data.forEach((d) ->
       d.coords = { y0: ypos, y1: ypos += d.commits }
-      d.color = colors(d.commits)
+      d.color = colors(i)
+      i += 1
     )
 
     @author_svg.append("g")
@@ -460,26 +463,30 @@ class BranchGraph
     g = @author_svg.selectAll("rect").data(data)
       .enter()
       .append("g")
+
     g.append("rect")
       .attr("width", 30)
       .attr("x", 5)
       .attr("y", (d) -> height - y(d.coords.y0))
       .attr("height", (d) -> y(d.coords.y0) - y(d.coords.y1))
       .attr("fill", (d) -> d.color)
-    g.append("text")
-      .attr("x", 90)
-      .attr("y", (d) -> height - y(d.coords.y0) + 15)
-      .text((d) -> d.name)
-    g.append("text")
-      .attr("x", 90)
-      .attr("y", (d) -> height - y(d.coords.y0) + 30)
-      .text((d) -> "#{d.commits} commits")
-    g.append("svg:image")
-      .attr("xlink:href", (d) -> d.gravatar_url)
-      .attr("x", 40)
-      .attr("y", (d) -> height - y(d.coords.y0))
-      .attr("width", "40")
-      .attr("height", "40")
+
+    #if there is enough space we chuck in the images etc. 
+    if y(g.datum().coords.y0) - y(g.datum().coords.y1) > 45
+      g.append("text")
+        .attr("x", 90)
+        .attr("y", (d) -> height - y(d.coords.y0) + 15)
+        .text((d) -> d.name)
+      g.append("text")
+        .attr("x", 90)
+        .attr("y", (d) -> height - y(d.coords.y0) + 30)
+        .text((d) -> "#{d.commits} commits")
+      g.append("svg:image")
+        .attr("xlink:href", (d) -> d.gravatar_url)
+        .attr("x", 40)
+        .attr("y", (d) -> height - y(d.coords.y0))
+        .attr("width", "40")
+        .attr("height", "40")
 
   getAuthorStats: (branch_name) ->
     vis = @
@@ -488,6 +495,7 @@ class BranchGraph
       vis.initAuthorStats(author_data)
 
   clearAuthorStats: ->
+    return
     $("#authors-graph").hide()
     $("#authors-graph-chart").empty()
 

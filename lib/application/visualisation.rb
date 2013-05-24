@@ -154,7 +154,7 @@ module Visualisation
     authors = []
     raw_authors = `git log master..#{branch} --pretty=format:%an,%ae \
       | awk '{ ++c[$0]; } END { for(cc in c) printf "%5d,%s\\n",c[cc],cc; }'\
-      | sort -r`.split(/\n/).each { |c| c.strip! }.slice(0, 3)
+      | sort -r`.split(/\n/).each { |c| c.strip! }
     raw_authors.each do |author|
       author = author.split(/,/)
       authors << {:name => author[1], :commits => author[0], :gravatar_url => gravatar_url(author[2])} 
