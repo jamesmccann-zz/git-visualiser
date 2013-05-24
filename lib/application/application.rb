@@ -3,7 +3,6 @@ class GitVisualiser < Sinatra::Base
     use SassEngine
     use CoffeeEngine
 
-    set :static, true                             
     set :public_dir, File.expand_path('..', __FILE__) 
         
     set :views,  File.expand_path('../views', __FILE__) 

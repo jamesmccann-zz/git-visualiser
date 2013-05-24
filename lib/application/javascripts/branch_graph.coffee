@@ -448,6 +448,8 @@ class BranchGraph
     i = 0
     data.forEach((d) ->
       d.coords = { y0: ypos, y1: ypos += d.commits }
+      console.log d.name + ": " + d.coords.y0 + ", " + d.coords.y1
+      console.log d.name + ": " + y(d.coords.y0) + ", " + y(d.coords.y0) - y(d.coords.y1)
       d.color = colors(i)
       i += 1
     )
