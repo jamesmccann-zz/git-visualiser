@@ -47,7 +47,7 @@ module Visualisation
 
   def self.branches_excluding_commit(commit_sha, remotes = true)
     if remotes
-      return branches_with_remotes - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
+      return branches_with_remotes.to_a - branches_containing_commit(commit_sha, true) #`git branch -a --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }
     else
       # TODO fix this
       # return branches - `git branch --contains #{commit_sha}`.split("\n").each { |b| b.gsub!(/[*]?\s/, '') }

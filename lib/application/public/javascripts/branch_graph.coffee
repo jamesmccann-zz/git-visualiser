@@ -228,28 +228,30 @@ class BranchGraph
       .style("stroke", (d) -> d3.rgb(branch_color(d)).darker().toString())
       .classed("reflexive", (d) -> d.reflexive)
       .on("mouseover", (d) ->
-        d3.selectAll("circle").filter((d2) -> d != d2).transition().style "opacity", "0.25"
-        d3.selectAll("text").filter((d2) -> d != d2).transition().style "opacity", "0.10"
-        d3.selectAll("path.link").filter((d2) -> d != d2).transition().style "opacity", "0.10"
+        vis.svg.selectAll("circle").filter((d2) -> d != d2).transition().style "opacity", "0.25"
+        vis.svg.selectAll("text").filter((d2) -> d != d2).transition().style "opacity", "0.10"
+        vis.svg.selectAll("path.link").filter((d2) -> d != d2).transition().style "opacity", "0.10"
+        vis.clearAuthorStats()
         vis.getAuthorStats(d.branch.name))
       .on("mouseout", (d) ->
-        d3.selectAll("circle").transition().style "opacity", "1"
-        d3.selectAll("text").transition().style "opacity", "1"
-        d3.selectAll("path").transition().style "opacity", "1"
+        vis.svg.selectAll("circle").transition().style "opacity", "1"
+        vis.svg.selectAll("text").transition().style "opacity", "1"
+        vis.svg.selectAll("path").transition().style "opacity", "1"
         vis.clearAuthorStats())
       .on("mousedown", (d) ->
         vis.mousedown_node = d
-        d3.selectAll("circle").filter((d2) -> 
+        vis.svg.selectAll("circle").filter((d2) -> 
           vis.neighbouring(vis.dom_node(d)[0].__data__.id, vis.dom_node(d2)[0].__data__.id)
           ).transition().style "opacity", "1"
-        d3.selectAll("text").filter((d2) -> 
+        vis.svg.selectAll("text").filter((d2) -> 
           vis.neighbouring(vis.dom_node(d)[0].__data__.id, vis.dom_node(d2)[0].__data__.id)
         ).transition().style "opacity", "1"
-        d3.selectAll("path.link").filter((d2) -> 
+        vis.svg.selectAll("path.link").filter((d2) -> 
           return false if d2 is undefined
           return true if d2.source == vis.mousedown_node || d2.target == vis.mousedown_node
         ).transition().style "opacity", "1")
       .on("dblclick", (d) ->
+        return if d.branch.diff.add == 0 && d.branch.diff.del == 0
         vis.commitGraph.load(d.branch.name) 
       )
       .call(@force.drag())
@@ -420,6 +422,7 @@ class BranchGraph
 
     x = d3.scale.ordinal().rangeRoundBands([0, width], .1)
     y = d3.scale.linear().rangeRound([height, 0])
+    y.domain([0, d3.sum data, (d) -> d.commits])
 
     colors = d3.scale.category10()
 
@@ -427,7 +430,7 @@ class BranchGraph
     yAxis = d3.svg.axis()
                   .scale(y)
                   .orient("left")
-                  .ticks(4)
+                  .tickValues([0, d3.sum(data, (d) -> d.commits)])
                   .tickFormat(d3.format("d"))
 
     @author_svg = d3.select("#authors-graph-chart")
@@ -441,17 +444,11 @@ class BranchGraph
     @y = y
     data.sort (a, b) -> b.commits - a.commits
 
-    y.domain([0, d3.sum data, (d) -> d.commits])
-    y.nice()
-
     ypos = 0
     i = 0
     data.forEach((d) ->
-      d.coords = { y0: ypos, y1: ypos += d.commits }
-      console.log d.name + ": " + d.coords.y0 + ", " + d.coords.y1
-      console.log d.name + ": " + y(d.coords.y0) + ", " + y(d.coords.y0) - y(d.coords.y1)
-      d.color = colors(i)
-      i += 1
+      d.coords = { y0: ypos, y1: ypos += parseInt(d.commits) }
+      d.color = colors(i+=1)
     )
 
     @author_svg.append("g")
@@ -474,22 +471,41 @@ class BranchGraph
       .attr("height", (d) -> y(d.coords.y0) - y(d.coords.y1))
       .attr("fill", (d) -> d.color)
 
-    #if there is enough space we chuck in the images etc. 
-    if y(g.datum().coords.y0) - y(g.datum().coords.y1) > 45
-      g.append("text")
-        .attr("x", 90)
-        .attr("y", (d) -> height - y(d.coords.y0) + 15)
-        .text((d) -> d.name)
-      g.append("text")
-        .attr("x", 90)
-        .attr("y", (d) -> height - y(d.coords.y0) + 30)
-        .text((d) -> "#{d.commits} commits")
-      g.append("svg:image")
-        .attr("xlink:href", (d) -> d.gravatar_url)
+    console.log "images"
+    
+    #if there is enough space we add in images/name/commits etc. 
+    g.filter((d, i) -> (y(d.coords.y0) - y(d.coords.y1)) >= 15)
+      .append("text")
+      .attr("x", (d) -> 
+        return 90 if (y(d.coords.y0) - y(d.coords.y1)) > 45
+        return 40
+      )
+      .attr("y", (d) -> height - y(d.coords.y0) + 15)
+      .text((d) -> d.name)
+    g.filter((d, i) -> (y(d.coords.y0) - y(d.coords.y1)) > 25)
+      .append("text")
+      .attr("x", (d) -> 
+        return 90 if (y(d.coords.y0) - y(d.coords.y1)) > 45
+        return 40
+      )
+      .attr("y", (d) -> height - y(d.coords.y0) + 30)
+      .text((d) -> "#{d.commits} commits")
+    g.filter((d, i) -> (y(d.coords.y0) - y(d.coords.y1)) > 45)
+      .append("svg:image")
+      .attr("xlink:href", (d) -> d.gravatar_url)
+      .attr("x", 40)
+      .attr("y", (d) -> height - y(d.coords.y0))
+      .attr("width", "40")
+      .attr("height", "40")
+
+    #label the number of authors not shown
+    num_small_authors = g.filter((d, i) -> (y(d.coords.y0) - y(d.coords.y1) < 15))[0].length
+    if num_small_authors > 0
+      @author_svg
+        .append("text")
         .attr("x", 40)
-        .attr("y", (d) -> height - y(d.coords.y0))
-        .attr("width", "40")
-        .attr("height", "40")
+        .attr("y", height)
+        .text("#{num_small_authors} more")
 
   getAuthorStats: (branch_name) ->
     @clearAuthorStats()

@@ -3,7 +3,7 @@ class GitVisualiser < Sinatra::Base
     use SassEngine
     use CoffeeEngine
 
-    set :public_dir, File.expand_path('..', __FILE__) 
+    set :public_dir, File.expand_path('../public/', __FILE__) 
         
     set :views,  File.expand_path('../views', __FILE__) 
     set :haml, { :format => :html5 }                    
@@ -32,11 +32,13 @@ class GitVisualiser < Sinatra::Base
       branches_include = Visualisation.branches_containing_commit(include_commit_sha) if include_commit_sha != ''
       branches_exclude = Visualisation.branches_excluding_commit(exclude_commit_sha) if exclude_commit_sha != ''
 
-      if !branches_include == {}
-        branches = Hash[branches_include.to_a - branches_exclude.to_a]
+      if branches_include != []
+        branches = branches_include.to_a - branches_exclude.to_a
       else
-        branches = branches_exclude
+        branches = branches_exclude.to_a
       end
+
+      puts branches
 
       content_type :json
       branches.to_json

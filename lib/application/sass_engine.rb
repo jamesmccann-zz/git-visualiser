@@ -1,6 +1,6 @@
 class SassEngine < Sinatra::Base
   
-  set :views,   File.dirname(__FILE__)    + '/stylesheets/scss'
+  set :views,   File.dirname(__FILE__)    + '/public/stylesheets/scss'
 
    get '/stylesheets/flat_ui.css' do
     sass 'flat_ui/flat-ui'.to_sym

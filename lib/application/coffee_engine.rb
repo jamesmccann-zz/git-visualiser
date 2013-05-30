@@ -1,7 +1,6 @@
 class CoffeeEngine < Sinatra::Base
   
-  set :views,   File.dirname(__FILE__)    + '/javascripts'
-  set :public_dir, File.expand_path('..', __FILE__)
+  set :views,   File.dirname(__FILE__)    + '/public/javascripts'
 
   get "/javascripts/d3.min.js" do
   end
